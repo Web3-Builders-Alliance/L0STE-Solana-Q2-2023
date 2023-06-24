@@ -10,7 +10,7 @@ use state::*;
 
 
 
-declare_id!("2qp7cHAarp2APej97MJ6xwrn4oPRiRb7464pJGarQ4vp");
+declare_id!("HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW");
 
 #[program]
 pub mod bookchain {
@@ -26,7 +26,6 @@ pub mod bookchain {
         ctx.accounts.init(project_name, project_bump, vault_bump)
     }
 
-    //QUESTION: If the the accounts are the same, should i use it both for withdraw and deposit?
     pub fn project_deposit(
         ctx: Context<ProjectChangeBalance>,
         deposit_amount: u64,
