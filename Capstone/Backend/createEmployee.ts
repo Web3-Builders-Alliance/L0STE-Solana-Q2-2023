@@ -6,7 +6,7 @@ import employeeWallet from "./wallet_helpers/wallet/Wallet2.json"
 let employeeW = Keypair.fromSecretKey(new Uint8Array(employeeWallet));
 let employeeName = "Test Employee";
 let employeeTitle = "Test Title";
-let monthlyPay = new BN(10);
+let monthlyPay = BN(10);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,14 +29,14 @@ const provider = new AnchorProvider(connection, new Wallet(keypair), { commitmen
 const program = new Program<Bookchain>(IDL, "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW" as Address, provider);
 
 (async () => {
-/* NEED HELP WITH THE FILTER
+
 projectAccount = ...
 {
     "jsonrpc": "2.0",
     "id": 1,
     "method": "getProgramAccounts",
     "params": [
-      "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW", //Is this the programId in reality?
+      "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW", 
       {
         "encoding": "base64",
         "filters": [
@@ -50,6 +50,7 @@ projectAccount = ...
                 }
             }
         ]
+        "dataslice"
       }
     ]
   }
