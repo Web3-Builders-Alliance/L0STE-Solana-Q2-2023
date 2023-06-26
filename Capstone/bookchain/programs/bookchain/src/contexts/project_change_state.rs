@@ -5,10 +5,7 @@ use crate::state::project::Project;
 
 #[derive(Accounts)]
 pub struct ProjectChangeState<'info> {
-    #[account(
-        mut,
-        constraint = user.key() == project.authority,
-    )]
+    #[account(mut)]
     pub project: Account<'info, Project>,
 
     #[account(mut)]
@@ -21,6 +18,8 @@ impl<'info> ProjectChangeState<'info> {
         &mut self,
         auth: Pubkey,
     ) -> Result<()> {
+        require!(self.project.authority.key() == self.user.key(), ProjError::NotAuthorized);
+
         self.project.authority = auth;
 
         Ok(())
@@ -33,6 +32,8 @@ impl<'info> ProjectChangeState<'info> {
         project_name: String,
     ) -> Result<()> {
         require!(project_name.len() <20, ProjError::TooManyCharacters);
+        require!(self.project.authority.key() == self.user.key(), ProjError::NotAuthorized);
+        
         self.project.project_name = project_name;
 
         Ok(())

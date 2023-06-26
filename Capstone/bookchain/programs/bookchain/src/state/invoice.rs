@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Invoice {
+    pub id: u8,
     pub project: Pubkey,
     pub employee: Pubkey,
     pub employee_title: String,
@@ -16,6 +17,7 @@ pub struct Invoice {
 impl Invoice {
     pub fn init(
         &mut self,
+        id: u8,
         project: Pubkey,
         employee: Pubkey,
         employee_title: String,
@@ -26,6 +28,7 @@ impl Invoice {
         invoice_bump: u8,
         vault_bump: u8,
     ) -> Result<()> {
+        self.id = id;
         self.project = project;
         self.employee = employee;
         self.employee_title = employee_title;

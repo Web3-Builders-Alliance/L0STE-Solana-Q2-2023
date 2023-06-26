@@ -4,8 +4,6 @@ import { Program } from "@coral-xyz/anchor";
 import { Bookchain } from "../target/types/bookchain";
 import { PublicKey, Commitment, Keypair, SystemProgram, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
 import { ASSOCIATED_TOKEN_PROGRAM_ID as associatedTokenProgram, TOKEN_PROGRAM_ID as tokenProgram, createMint, createAccount, mintTo, getAssociatedTokenAddress, TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount } from "@solana/spl-token"
-import { randomBytes } from "crypto"
-import { assert } from "chai"
 
 const commitment: Commitment = "confirmed"; // processed, confirmed, finalized
 
@@ -18,7 +16,6 @@ describe("bookchain", () => {
   const connection = new Connection("https://api.devnet.solana.com");
   const keypair = anchor.web3.Keypair.generate(); //This is the project Manager
   const employeeWallet = anchor.web3.Keypair.generate(); //This is the employee
-  const isRecursive = true;
 
   ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,6 +32,7 @@ describe("bookchain", () => {
   let employeeTitle = "Developer"; //Put your employee title here
   let employeeName = "John Doe"; //Put your employee name here
   let monthlyPay = new anchor.BN(0.5*LAMPORTS_PER_SOL); //Put your employee monthly pay here
+  const isRecursive = true;
 
   //Mint
   let mint: PublicKey;
@@ -231,7 +229,9 @@ describe("bookchain", () => {
 
   //EMPLOYEE
 
-  const employee = [Buffer.from("employee"), projectKey.toBuffer()];
+  let employeeNumber = 0;
+
+  const employee = [Buffer.from("employee"), projectKey.toBuffer(), employeeNumber.toBuffer()];
   const [employeeKey, _bumpbump] = PublicKey.findProgramAddressSync(employee, program.programId);
 
   it("Creates an Employee", async () => {

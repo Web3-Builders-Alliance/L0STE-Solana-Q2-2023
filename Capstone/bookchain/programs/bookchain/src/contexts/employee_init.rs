@@ -3,30 +3,19 @@ use anchor_spl::token::{Mint, Token, TokenAccount};
 use anchor_spl::associated_token::AssociatedToken;
 
 use crate::errors::EmplErr;
+use crate::errors::ProjError;
 use crate::state::project::Project;
 use crate::state::employee::Employee;
 
 #[derive(Accounts)]
+#[instruction(id: u8)]
 pub struct EmployeeInit<'info> {
-    #[account(
-        mut,
-        seeds = [b"vault", project.key().as_ref()],
-        bump = project.vault_bump,
-        token::mint = token,
-        token::authority = project
-    )]
-    pub project_vault: Box<Account<'info, TokenAccount>>,
-    #[account(
-        mut,
-        seeds = [b"project", initializer.key().as_ref()],
-        bump = project.project_bump,
-        constraint = initializer.key() == project.authority,
-    )]
+    #[account(mut)]
     pub project: Account<'info, Project>,
     #[account(
         init, 
         payer = initializer, 
-        seeds = [b"employee", project.key().as_ref()], 
+        seeds = [b"employee", project.key().as_ref(), id.to_le_bytes().as_ref()], 
         bump,
         space = Employee::space() + 20 + 20   //Maximum space for the title
     )]
@@ -50,6 +39,7 @@ pub struct EmployeeInit<'info> {
 impl<'info> EmployeeInit<'info> {
     pub fn init(
         &mut self,
+        id: u8,
         employee: Pubkey,
         employee_name: String,
         employee_title: String,
@@ -60,22 +50,30 @@ impl<'info> EmployeeInit<'info> {
         require!(monthly_pay>0, EmplErr::PayTooLow);
         require!(employee_title.len() < 20, EmplErr::TitleTooLong);
         require!(employee_name.len() < 20, EmplErr::NameTooLong);
+        require!(self.project.authority.key() == self.initializer.key(), ProjError::NotAuthorized);
 
+        //Update project State
+        self.project.employee += 1;
+
+        let id = id;
         let project = self.project.key();
         let employee = employee;   
         let employee_name = employee_name;
         let employee_title = employee_title;
         let monthly_pay = monthly_pay;
         let is_recursive = false;
+        let invoice = 0;
         let employee_bump = employee_bump;
 
         self.employee.init(
+            id,
             project,
             employee,
             employee_name,
             employee_title,
             monthly_pay,
             is_recursive,
+            invoice,
             employee_bump,
         )
     }

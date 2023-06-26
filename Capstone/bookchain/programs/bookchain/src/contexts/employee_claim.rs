@@ -9,6 +9,7 @@ use crate::state::employee::Employee;
 use crate::state::invoice::Invoice;
 
 #[derive(Accounts)]
+#[instruction(id: u8)]
 pub struct EmployeeClaim<'info> {
     #[account(
         mut,
@@ -20,7 +21,7 @@ pub struct EmployeeClaim<'info> {
     pub invoice_vault: Box<Account<'info, TokenAccount>>, // The vault ATA
     #[account(
         mut,
-        seeds = [b"invoice", employee.key().as_ref()], 
+        seeds = [b"invoice", employee.key().as_ref(), invoice.id.to_le_bytes().as_ref()], 
         bump = invoice.invoice_bump,
     )]
     pub invoice: Account<'info, Invoice>,
@@ -37,7 +38,7 @@ pub struct EmployeeClaim<'info> {
     #[account(
         init, 
         payer = employee_wallet, 
-        seeds = [b"invoice", employee.key().as_ref()], 
+        seeds = [b"invoice", employee.key().as_ref(), id.to_le_bytes().as_ref()], 
         bump,
         space = Invoice::space() + 20
     )]
@@ -57,11 +58,7 @@ pub struct EmployeeClaim<'info> {
         bump = project.project_bump,
     )]
     pub project: Account<'info, Project>,
-    #[account(
-        mut,
-        seeds = [b"employee", project.key().as_ref()], 
-        bump = employee.employee_bump,
-    )]
+    #[account(mut)]
     pub employee: Account<'info, Employee>,
 
     #[account(mut)]
@@ -76,6 +73,7 @@ pub struct EmployeeClaim<'info> {
 impl<'info> EmployeeClaim<'info> {
     pub fn claim(
         &mut self,
+        id: u8,
         from: i64,
         to: i64,
         invoice_bump: u8,
@@ -83,12 +81,13 @@ impl<'info> EmployeeClaim<'info> {
     ) -> Result<()> {
         require!(Clock::get()?.unix_timestamp > self.invoice.to, InvErr::TimeNotPassed);
         require!(self.invoice.has_claimed == false, InvErr::AlreadyClaimed);
-        require!(self.invoice.employee == self.employee.key().clone(), InvErr::NotAuthorized);
+        require!(self.invoice.employee == self.employee.key(), InvErr::NotAuthorized);
         
         //Claim the Invoice
         let seeds = &[
             "vault".as_bytes(),
             &self.invoice.key().clone().to_bytes(),
+            &self.invoice.id.to_le_bytes(),
             &[self.invoice.invoice_bump]
         ];
         let signer_seeds = &[&seeds[..]];
@@ -113,6 +112,7 @@ impl<'info> EmployeeClaim<'info> {
             self.project.balance -= self.employee.monthly_pay;
 
             //Invoice_state
+            let id = id;
             let project = self.project.key();
             let employee = self.employee.key();
             let employee_title = &self.employee.employee_title;
@@ -124,6 +124,7 @@ impl<'info> EmployeeClaim<'info> {
             let vault_bump = vault_bump;
 
             self.invoice.init(
+                id,
                 project,
                 employee,
                 employee_title.to_string(),
@@ -134,26 +135,29 @@ impl<'info> EmployeeClaim<'info> {
                 invoice_bump,
                 vault_bump,
             );
-
+    
             //Send to Escrow the monthly_pay;
             let seeds = &[
                 "project".as_bytes(),
-                &self.project.authority.to_bytes(),
+                &self.project.authority.key().clone().to_bytes(),
+                &self.project.id.to_le_bytes(),
                 &[self.project.project_bump]
             ];
             let signer_seeds = &[&seeds[..]];
-
+    
             let cpi_program = self.system_program.to_account_info();
             let cpi_accounts = Transfer{
                 from: self.project_vault.to_account_info(), 
-                to: self.invoice_vault.to_account_info(),
+                to: self.new_invoice_vault.to_account_info(),
                 authority: self.project.to_account_info(),
             };
             let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
-
-            transfer(cpi_context, self.employee.monthly_pay)?;
-
-            self.project.balance -= self.employee.monthly_pay;
+    
+            transfer(cpi_context, balance)?;
+    
+            self.employee.invoice += 1;
+    
+            self.project.balance -= balance; 
         } else {
             self.project.monthly_spending -= self.employee.monthly_pay;
         }

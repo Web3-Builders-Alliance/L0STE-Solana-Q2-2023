@@ -6,6 +6,7 @@ use crate::errors::ProjError;
 use crate::state::project::Project;
 
 #[derive(Accounts)]
+#[instruction(id: u64)]
 pub struct ProjectInit<'info> {
     #[account(
         init,
@@ -19,7 +20,7 @@ pub struct ProjectInit<'info> {
     #[account(
         init, 
         payer = initializer, 
-        seeds = [b"project", initializer.key().as_ref()], 
+        seeds = [b"project", initializer.key().as_ref(), id.to_le_bytes().as_ref()], 
         bump,
         space = Project::space() + 20           // 20 = max number of characters in the project name
     )]
@@ -42,6 +43,7 @@ pub struct ProjectInit<'info> {
 impl<'info> ProjectInit<'info> {
     pub fn init(
         &mut self,
+        id: u64,
         project_name: String,
         project_bump: u8,
         vault_bump: u8,
@@ -49,19 +51,25 @@ impl<'info> ProjectInit<'info> {
         //We made space only for 20 character
         require!(project_name.len() <20, ProjError::TooManyCharacters);
 
+        let id = id;
         let authority = self.initializer.key();
+        let project_name = project_name;
         let balance = 0;
         let monthly_spending = 0;
+        let employee = 0;
         let project_bump = project_bump;
         let vault_bump = vault_bump;
 
         self.project.init(
+            id,
             authority,
             project_name,
             balance,
             monthly_spending,
+            employee,
             project_bump,
             vault_bump,
         )
+
     }
 }

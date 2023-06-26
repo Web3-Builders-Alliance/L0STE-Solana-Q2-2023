@@ -17,9 +17,8 @@ pub struct ProjectChangeBalance<'info> {
     pub project_vault: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
-        seeds = [b"project", user.key().as_ref()],
+        seeds = [b"project", user.key().as_ref(), project.id.to_le_bytes().as_ref()],
         bump = project.project_bump,
-        constraint = user.key() == project.authority,
     )]
     pub project: Account<'info, Project>,
 
@@ -44,6 +43,7 @@ impl<'info> ProjectChangeBalance<'info> {
     ) -> Result<()> {
         //We don't want the user to deposit anything <0
         require!(deposit_amount > 0, ProjError::DepositErr);
+        require!(self.project.authority.key() == self.user.key(), ProjError::NotAuthorized);
 
         let cpi_program = self.system_program.to_account_info();
         let cpi_accounts = Transfer{
@@ -68,11 +68,12 @@ impl<'info> ProjectChangeBalance<'info> {
     ) -> Result<()> {
         //We don't want the user to withdraw more than the project balance
         require!(withdraw_amount < self.project.balance, ProjError::WithdrawErr);
+        require!(self.project.authority.key() == self.user.key(), ProjError::NotAuthorized);
 
-        //Create the PDA seeds. It need 3 value: the name, the ID and the auth_key
         let seeds = &[
             "project".as_bytes(),
             &self.user.key().clone().to_bytes(),
+            &self.project.id.to_le_bytes(),
             &[self.project.project_bump]
         ];
         let signer_seeds = &[&seeds[..]];

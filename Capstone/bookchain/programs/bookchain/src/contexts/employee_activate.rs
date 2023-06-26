@@ -3,11 +3,13 @@ use anchor_spl::token::{Mint, Token, TokenAccount, Transfer, transfer};
 use anchor_spl::associated_token::AssociatedToken;
 
 use crate::errors::EmplErr;
+use crate::errors::ProjError;
 use crate::state::project::Project;
 use crate::state::employee::Employee;
 use crate::state::invoice::Invoice;
 
 #[derive(Accounts)]
+#[instruction(id: u8)]
 pub struct EmployeeActivate<'info> {
     #[account(
         mut,
@@ -19,16 +21,11 @@ pub struct EmployeeActivate<'info> {
     pub project_vault: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
-        seeds = [b"project", initializer.key().as_ref()],
+        seeds = [b"project", initializer.key().as_ref(), project.id.to_le_bytes().as_ref()],
         bump = project.project_bump,
-        constraint = initializer.key() == project.authority,
     )]
     pub project: Account<'info, Project>,
-    #[account(
-        mut,
-        seeds = [b"employee", project.key().as_ref()], 
-        bump = employee.employee_bump,
-    )]
+    #[account(mut)]
     pub employee: Account<'info, Employee>,
     #[account(
         init,
@@ -42,7 +39,7 @@ pub struct EmployeeActivate<'info> {
     #[account(
         init, 
         payer = initializer, 
-        seeds = [b"invoice", employee.key().as_ref()], 
+        seeds = [b"invoice", employee.key().as_ref(), id.to_le_bytes().as_ref()], 
         bump,
         space = Invoice::space() + 20
     )]
@@ -65,15 +62,17 @@ pub struct EmployeeActivate<'info> {
 impl<'info> EmployeeActivate<'info> {
     pub fn activate(
         &mut self,
+        invoice_id: u8,
         from: i64,
         to: i64,
         invoice_bump: u8,
         vault_bump: u8,
         is_recursive: bool,
     ) -> Result<()> {
-        //We made space only for 20 character
         require!(self.employee.monthly_pay < self.project.balance, EmplErr::NotEnoughFunds);
+        require!(self.project.authority.key() == self.initializer.key(), ProjError::NotAuthorized);
 
+        let id = invoice_id;
         let project = self.project.key();
         let employee = self.employee.key();
         let employee_title = &self.employee.employee_title;
@@ -85,6 +84,7 @@ impl<'info> EmployeeActivate<'info> {
         let vault_bump = vault_bump;
 
         self.invoice.init(
+            id,
             project,
             employee,
             employee_title.to_string(),
@@ -105,6 +105,7 @@ impl<'info> EmployeeActivate<'info> {
         let seeds = &[
             "project".as_bytes(),
             &self.initializer.key().clone().to_bytes(),
+            &self.project.id.to_le_bytes(),
             &[self.project.project_bump]
         ];
         let signer_seeds = &[&seeds[..]];
@@ -117,10 +118,12 @@ impl<'info> EmployeeActivate<'info> {
         };
         let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
 
-        transfer(cpi_context, self.employee.monthly_pay)?;
+        transfer(cpi_context, balance)?;
 
-        self.project.balance -= self.employee.monthly_pay;
-        self.project.monthly_spending += self.employee.monthly_pay;
+        self.employee.invoice += 1;
+
+        self.project.balance -= balance;
+        self.project.monthly_spending += balance;
 
         Ok(())
 

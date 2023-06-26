@@ -1,7 +1,5 @@
 use anchor_lang::error_code;
 
-//Errore per dire che per cambiare le cose deve essere l'autorità - Manca
-
 #[error_code]
 pub enum ProjError {
     #[msg("The project name is too long.")]
@@ -10,6 +8,8 @@ pub enum ProjError {
     DepositErr,
     #[msg("You tried to withdraw more than the balance")]
     WithdrawErr,
+    #[msg("You are not the owner of this project")]
+    NotAuthorized,
 }
 
 #[error_code]
@@ -22,6 +22,8 @@ pub enum EmplErr {
     NotEnoughFunds,
     #[msg("The name is too long. (Keep it 20 character maximum)")]
     NameTooLong,
+    #[msg("You are not on the payroll.")]
+    NotRecursive,
 }
 
 #[error_code]
