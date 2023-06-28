@@ -9,7 +9,7 @@ use crate::state::employee::Employee;
 use crate::state::invoice::Invoice;
 
 #[derive(Accounts)]
-#[instruction(id: u8)]
+#[instruction(id: u64)]
 pub struct EmployeeActivate<'info> {
     #[account(
         mut,
@@ -62,7 +62,7 @@ pub struct EmployeeActivate<'info> {
 impl<'info> EmployeeActivate<'info> {
     pub fn activate(
         &mut self,
-        invoice_id: u8,
+        id: u64,
         from: i64,
         to: i64,
         invoice_bump: u8,
@@ -72,7 +72,7 @@ impl<'info> EmployeeActivate<'info> {
         require!(self.employee.monthly_pay < self.project.balance, EmplErr::NotEnoughFunds);
         require!(self.project.authority.key() == self.initializer.key(), ProjError::NotAuthorized);
 
-        let id = invoice_id;
+        let id = id;
         let project = self.project.key();
         let employee = self.employee.key();
         let employee_title = &self.employee.employee_title;

@@ -8,7 +8,7 @@ use crate::state::project::Project;
 use crate::state::employee::Employee;
 
 #[derive(Accounts)]
-#[instruction(id: u8)]
+#[instruction(id: u64)]
 pub struct EmployeeInit<'info> {
     #[account(mut)]
     pub project: Account<'info, Project>,
@@ -39,7 +39,7 @@ pub struct EmployeeInit<'info> {
 impl<'info> EmployeeInit<'info> {
     pub fn init(
         &mut self,
-        id: u8,
+        id: u64,
         employee: Pubkey,
         employee_name: String,
         employee_title: String,

@@ -9,7 +9,7 @@ use crate::state::employee::Employee;
 use crate::state::invoice::Invoice;
 
 #[derive(Accounts)]
-#[instruction(id: u8)]
+#[instruction(id: u64)]
 pub struct EmployeeClaim<'info> {
     #[account(
         mut,
@@ -73,7 +73,7 @@ pub struct EmployeeClaim<'info> {
 impl<'info> EmployeeClaim<'info> {
     pub fn claim(
         &mut self,
-        id: u8,
+        id: u64,
         from: i64,
         to: i64,
         invoice_bump: u8,

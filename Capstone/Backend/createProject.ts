@@ -1,4 +1,4 @@
-// FLOW 1.1: Create a new project with projectName as input
+// FLOW 1.1: Create a new project  projectName as input
 
 //INPUTS:
 let projectName = "Test Project";
@@ -9,7 +9,7 @@ import { Connection, Keypair, SystemProgram, PublicKey } from "@solana/web3.js"
 import { Program, Wallet, AnchorProvider, Address, BN } from "@project-serum/anchor"
 import { ASSOCIATED_TOKEN_PROGRAM_ID as associatedTokenProgram, TOKEN_PROGRAM_ID as tokenProgram, getOrCreateAssociatedTokenAccount } from "@solana/spl-token"
 import { Bookchain, IDL } from "./programs/bookchain";
-import wallet from "./wallet_helpers/wallet/Wallet1.json"
+import wallet from "./wallet_helpers/wallet/Wallet2.json"
 
 // We're going to import our keypair from the wallet file
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
@@ -25,10 +25,10 @@ const program = new Program<Bookchain>(IDL, "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFU
 
 (async () => {
 
+    console.log(keypair.publicKey.toBase58());
+
     const id = new BN(Math.floor(Math.random() * 100000000))
-
     const mint = new PublicKey("FXSZjZ2TXkKWSXRGgV3UJ15Cf36mpZEjTybcBmW6RgoG");
-
     const ata = await getOrCreateAssociatedTokenAccount(provider.connection, keypair, mint, keypair.publicKey);
     let initializerAta = ata.address;
 

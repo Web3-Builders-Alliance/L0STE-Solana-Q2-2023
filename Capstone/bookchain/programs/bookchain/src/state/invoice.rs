@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Invoice {
-    pub id: u8,
+    pub id: u64,
     pub project: Pubkey,
     pub employee: Pubkey,
     pub employee_title: String,
@@ -17,7 +17,7 @@ pub struct Invoice {
 impl Invoice {
     pub fn init(
         &mut self,
-        id: u8,
+        id: u64,
         project: Pubkey,
         employee: Pubkey,
         employee_title: String,
@@ -46,6 +46,7 @@ impl Invoice {
 impl Invoice {
     pub fn space() -> usize {
         8 +     //  Discriminator
+        4 +     //  id
         32 +    //  Wallet address of the project PDA
         32 +    //  Wallet address of the Employee
         4 +     //  Title

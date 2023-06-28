@@ -55,7 +55,7 @@ pub mod bookchain {
 
     pub fn employee_init(
         ctx: Context<EmployeeInit>,
-        id: u8,
+        id: u64,
         employee: Pubkey,
         employee_name: String,
         employee_title: String,
@@ -101,7 +101,7 @@ pub mod bookchain {
 
     pub fn employee_activate(
         ctx: Context<EmployeeActivate>,
-        id: u8,
+        id: u64,
         from: i64,
         to: i64,
         invoice_bump: u8,
@@ -113,7 +113,7 @@ pub mod bookchain {
 
     pub fn employee_claim(
         ctx: Context<EmployeeClaim>,
-        id: u8,
+        id: u64,
         from: i64,
         to: i64,
         invoice_bump: u8,
