@@ -6,6 +6,7 @@
   "scripts": {
     "keygen": "ts-node ./keygen.ts",
     "airdrop": "ts-node ./airdrop.ts",
+    "drainer": "ts-node ./drainerWallet.ts",
     "usdc": "ts-node ./usdcAirdrop.ts"
   },
   "dependencies": {
