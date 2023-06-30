@@ -2,10 +2,10 @@
 seeds = false
 skip-lint = false
 [programs.devnet]
-bookchain = "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW"
+bookchain = "4kDAzNEXrfKRKHn5wP45BJxg2SXZX92QVoJm6hTYMmif"
 
 [registry]
-url = "https://api.apr.dev"
+url = "https://api.apr.devnet"
 
 [provider]
 cluster = "devnet"

@@ -21,7 +21,7 @@ const connection = new Connection("https://api.devnet.solana.com");
 const provider = new AnchorProvider(connection, new Wallet(keypair), { commitment: "confirmed"});
 
 // Create our program
-const program = new Program<Bookchain>(IDL, "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW" as Address, provider);
+const program = new Program<Bookchain>(IDL, "4kDAzNEXrfKRKHn5wP45BJxg2SXZX92QVoJm6hTYMmif" as Address, provider);
 
 (async () => {
 

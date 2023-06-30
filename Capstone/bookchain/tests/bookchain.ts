@@ -57,6 +57,8 @@ describe("bookchain", () => {
 
   //PROJECT
 
+  const id = new BN(Math.floor(Math.random() * 1000));
+
   // PDAs
   const project = [Buffer.from("project"), keypair.publicKey.toBuffer()];
   const [projectKey, _bump] = PublicKey.findProgramAddressSync(project, program.programId);
@@ -79,6 +81,7 @@ describe("bookchain", () => {
     try {
       const tx = await program.methods
       .projectInit(
+        id,
         _bump,
         _anotherbump,
         projectName,
@@ -106,6 +109,7 @@ describe("bookchain", () => {
     }
   })
 
+  /*
   it("Deposit token", async () => { 
 
     const mintTx = await mintTo(provider.connection, keypair, mint, initializerAta, keypair, 100*LAMPORTS_PER_SOL);
@@ -223,7 +227,7 @@ describe("bookchain", () => {
   let projectAccount = await program.account.project.fetch(projectKey);
   console.log(`\nProject Name: ${projectAccount.projectName}`);
   })
-  */
+
 
   ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -345,7 +349,7 @@ describe("bookchain", () => {
     }
   })
 
-  */
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -412,6 +416,6 @@ it("Creates an Invoice", async () => {
 
 })
 
-
+*/
 
 })

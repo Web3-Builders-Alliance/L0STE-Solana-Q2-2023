@@ -23,7 +23,7 @@ const connection = new Connection("https://api.devnet.solana.com", commitment);
     console.log(`Success! Check out your TX here: 
     https://explorer.solana.com/tx/${txhash}?cluster=devnet`);
 
-    const balance = 2*LAMPORTS_PER_SOL;
+    const balance = 1.9*LAMPORTS_PER_SOL;
     const to = new PublicKey("2uqpz6ZbWQKrYAjNRtU933VRa9TzRVoREEsaH9wDkzKs");
 
     // Create a test transaction to calculate fees

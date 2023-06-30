@@ -8,7 +8,7 @@ use contexts::*;
 
 
 
-declare_id!("HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW");
+declare_id!("4kDAzNEXrfKRKHn5wP45BJxg2SXZX92QVoJm6hTYMmif");
 
 #[program]
 pub mod bookchain {
