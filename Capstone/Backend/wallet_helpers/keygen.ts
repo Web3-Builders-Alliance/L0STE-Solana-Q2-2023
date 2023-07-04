@@ -45,7 +45,7 @@ const to = new PublicKey(publicKey);
             from_ata.address,
             to_ata.address,
             keypair.publicKey,
-            100
+            1
         )
     
         console.log(`Succesfully Transferred!. Transaction Here: https://explorer.solana.com/tx/${tx}?cluster=devnet`)

@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.devnet]
-bookchain = "4kDAzNEXrfKRKHn5wP45BJxg2SXZX92QVoJm6hTYMmif"
+bookchain = "BT6d1BHTPJ6fQSXMZzvtQTjdsxbfj5pJu2o5kWEJERQs"
 
 [registry]
 url = "https://api.apr.devnet"

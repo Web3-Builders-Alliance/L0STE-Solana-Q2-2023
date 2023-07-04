@@ -15,6 +15,7 @@ let employeeWallet = Keypair.fromSecretKey(new Uint8Array(wallet2));
 let employeeName = "Test Employee";
 let employeeTitle = "Test Title";
 let monthlyPay = new BN(10);
+let projectName = "WBA0";
 
 // We're going to import our keypair from the wallet file
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
@@ -26,7 +27,7 @@ const connection = new Connection("https://api.devnet.solana.com");
 const provider = new AnchorProvider(connection, new Wallet(keypair), { commitment: "confirmed"});
 
 // Create our program
-const program = new Program<Bookchain>(IDL, "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFUZ4DTFrsFW" as Address, provider);
+const program = new Program<Bookchain>(IDL, "BT6d1BHTPJ6fQSXMZzvtQTjdsxbfj5pJu2o5kWEJERQs" as Address, provider);
 
 (async () => {
 
@@ -40,10 +41,24 @@ const program = new Program<Bookchain>(IDL, "HwnJp9Gkz8uBX5e3GC2B1cbp95iVy5CCjFU
         ]
     );
 
-    let id = new BN(res[0].account.employee);
-    let projectKey = res[0].publicKey;
+    let i = 0;
+    while (i<res.length) {
+        if (res[i].account.projectName == projectName) {
+            break;
+        } else {
+            i++;
+        }
+    }
+
+    console.log ("This is the res: ", res[i]);
+    let id = new BN(res[i].account.employee);
+    const projectid = new BN(res[i].account.id);
+
+    const project = [Buffer.from("project"), keypair.publicKey.toBuffer(), projectid.toArrayLike(Buffer, 'le', 8)];
+    const [projectKey, _bumpbump] = PublicKey.findProgramAddressSync(project, program.programId);
 
     console.log("This is the ID: ", id);
+    console.log("This is the projectKey: ", projectKey.toBase58())
 
     const mint = new PublicKey("FXSZjZ2TXkKWSXRGgV3UJ15Cf36mpZEjTybcBmW6RgoG");
     const ata = await getOrCreateAssociatedTokenAccount(provider.connection, keypair, mint, keypair.publicKey);

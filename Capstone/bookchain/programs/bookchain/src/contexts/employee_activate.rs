@@ -19,6 +19,8 @@ pub struct EmployeeActivate<'info> {
         token::authority = project
     )]
     pub project_vault: Box<Account<'info, TokenAccount>>,
+
+    //NB non è detto che sia l'initializer, mettere auth
     #[account(
         mut,
         seeds = [b"project", initializer.key().as_ref(), project.id.to_le_bytes().as_ref()],
